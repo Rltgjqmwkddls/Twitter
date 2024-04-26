@@ -11,7 +11,7 @@ app.use('/twwets', tweetsRouter)
 
 app.use((req, res, next) => {
     res.status(404)
-})
+});
 
 app.listen(8080)
 
