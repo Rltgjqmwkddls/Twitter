@@ -22,8 +22,8 @@ export async function getTweet(req, res, next) {
 // 트윗을 생성하는 함수
 export async function creatTweet(req, res, next) {
     const {text, name, username} = req.body
-    const tweet = await tweetRepository.create(text, name, username)
-    res.status(201).josn(tweet)
+    const tweets = await tweetRepository.create(text, name, username)
+    res.status(201).json(tweets)
 }
 
 // 트윗을 변경하는 함수
@@ -42,5 +42,5 @@ export async function updateTweet(req, res, next) {
 export async function deleteTweet(req, res, next) {
     const id = req.params.id
     await tweetRepository.remove(id)
-    res.sendStatus (204)
+    res.sendStatus(204)
 }

@@ -39,7 +39,8 @@ export async function create(text, name, username) {
         text,
         createdAt: Date.now().toString(),
         name,
-        username // 키 값과 변수값이 같으면 한 번만 사용 
+        username, // 키 값과 변수값이 같으면 한 번만 사용
+        url:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJSRyel4MCk8BAbI6gT_j4DBTEIcY0WW4WWfoklymsWA&s'
     }
     tweets = [tweet, ...tweets]
     return tweets
