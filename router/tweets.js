@@ -6,7 +6,7 @@ let tweets = [
     {
         id: '1',
         text: '안녕하세요',
-        createdAt: Date.now().toString(),
+        createdAt: Date.now().toString(), // 현재시간
         name: '김사과',
         username: 'apple',
         url: 'https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxODA0MDVfMjc2%2FMDAxNTIyOTMwMjI2MDgw.ozCD0yIHH74fspbyayIr3Uf0XtgdVa1sPoL4AGMZW1sg.reQF_ygDQs13dtK-5lr6a7omXxvpmZmfeXDhdfbG5_kg.PNG.hanjjj1%2F%25BB%25E7%25B0%25FA-s1.png&type=a340'
@@ -25,10 +25,10 @@ let tweets = [
 // GET
 // http://localhost:8080/tweets?username=:username
 router.get('/', (req, res, next) => {
-    const username = req.query.username
+    const username = req.query.username // 쿼리 파라미터로 username을 받기
     const data = username 
-        ? tweets.filter((tweets) => tweets.username == username)
-        : tweets
+        ? tweets.filter((tweets) => tweets.username == username) // username과 일치하는 사용자 이름을 가진 트윗만 필터링
+        : tweets // 없을 경우 tweets 배열 전체를 data에 할당
     res.status(200).json(data)
 })
 
@@ -37,8 +37,8 @@ router.get('/', (req, res, next) => {
 // GET
 // http://localhost:8080/tweets/:id
 router.get('/:id', (req, res, next) => {
-    const id = req.params.id
-    const tweet = tweets.find((tweet) => tweet.id === id)
+    const id = req.params.id // URL 파라미터로 id를 받기
+    const tweet = tweets.find((tweet) => tweet.id === id) // id와 일치하는 트윗 찾기
     if(tweet){
         res.status(200).json(tweet)
     }else{
@@ -59,7 +59,7 @@ router.get('/:id', (req, res, next) => {
         username: username,
         url: "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxODA0MDVfMjc2%2FMDAxNTIyOTMwMjI2MDgw.ozCD0yIHH74fspbyayIr3Uf0XtgdVa1sPoL4AGMZW1sg.reQF_ygDQs13dtK-5lr6a7omXxvpmZmfeXDhdfbG5_kg.PNG.hanjjj1%2F%25BB%25E7%25B0%25FA-s1.png&type=a340"
     }
-    tweets = [tweets, tweets]
+    tweets = [tweets, ...tweets]
     res.status(201).json(tweets)
  })
 
@@ -77,9 +77,10 @@ router.get('/:id', (req, res, next) => {
 // json형태로 입력 후 변경된 데이터까지 모두 json으로 출력
 router.put('/:id', (req, res, next) => {
     const id = req.params.id
-    const text = req.body.text
+    const text = req.body.text // 요청 본문으로 text를 받아 트윗을 수정
     const tweet = tweets.find((tweet) => tweet.id === id)
     if(tweet){
+        tweet.text = text
         res.status(201).json(tweet)
     }else{
         res.status(404).json({message: `${id}의 트윗이 없습니다`})
@@ -90,8 +91,8 @@ router.put('/:id', (req, res, next) => {
 // DELETE
 // http://localhost:8080/tweets/:id
 router.delete('/:id', (req, res, next) => {
-    const id = req.params.id
-    tweets =tweets.filter((tweet) => tweet.id !== id)
+    const id = req.params.id // id를 받아 트윗을 삭제
+    tweets =tweets.filter((tweet) => tweet.id !== id) // 해당 id가 아닌 트윗만 남겨 배열을 재할당
     res.sendStatus(204)
 })
 
