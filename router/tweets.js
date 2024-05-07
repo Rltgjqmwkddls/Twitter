@@ -10,6 +10,7 @@ const router = express.Router()
 문제
 Post, Put에 text에 대해 빈 문자열을 없애고, 최소 3자 이상 입력해야 데이터를 저장하도록 API에 적용
 */
+
 const validateTweet = [
     body('text').trim().isLength({min:3}).withMessage('최소 3자 이사 입력'), validate
 ]
