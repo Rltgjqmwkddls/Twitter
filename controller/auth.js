@@ -41,8 +41,8 @@ export async function login(req, res, next){
 // }
 
 export async function me(req, res, next){
-    const user = await authRepository.findById(req.username);
-    if(!user){
+    const user = await authRepository.findById(req.userId);
+    if(!user[0][0]){
         return res.status(404).json({message: `일치하는 사용자가 없음`});
     }
     res.status(200).json({token: req.token, username: user.username});
