@@ -1,52 +1,27 @@
-import SQ from 'sequelize'
+import MongoDB from 'mongodb'
 import { sequelize } from '../db/database.js'
-const DataTypes = SQ.DataTypes
 
-export const User = sequelize.define(
-    'user',
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            allowNull: false,
-            primaryKey: true
-        },
-        username: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        pasword: {
-            type: DataTypes.STRING(150),
-            allowNull: false
-        },
-        name: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        email: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        url: DataTypes.STRING(1000)
-    },
-    { timestamps: false}
-)
+const ObjectID = MongoDB.ObjectId
 
-// 아이디(username) 중복검사
+// 아이디 (uername) 중복검사
 export async function findByUsername(username){
-    return User.findOne({where: {username}}) // 하나만 찾기(username과 일치하는 것)
+    return getUsers().find({username}).next().then(mapOptionalUser)
 }
 
 // id 중복검사
 export async function findById(id){
-    return User.findByPk(id) // primary key로 찾기
+    return getUsers().find({_id: new ObjectID(id)}).next().then(mapOptionalUser)
 }
 
+// 회원가입
 export async function createUser(user){
-    return User.create(user).then((data) => data.dataValues.id)
+    return getUsers().insertOne(user).then((result) => console.log(result.insertId.toString()))
 }
 
 // export async function login(username){
-//     const user = users.find((user) => user.username === username) // 정보 찾기
-//     return user
+//     return getUsers.find((users) => users.username === username)
 // }
+
+function mapOptionalUser(user){
+    return user ? { ...user, id:user._id.inString()} : user
+}
