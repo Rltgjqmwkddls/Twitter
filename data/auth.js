@@ -1,29 +1,49 @@
-import {db} from '../db/database.js'
+import SQ from 'sequelize'
+import { sequelize } from '../db/database.js'
+const DataTypes = SQ.DataTypes
+
+export const User = sequelize.define(
+    'user',
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            allowNull: false,
+            primaryKey: true
+        },
+        username: {
+            type: DataTypes.STRING(50),
+            allowNull: false
+        },
+        pasword: {
+            type: DataTypes.STRING(150),
+            allowNull: false
+        },
+        name: {
+            type: DataTypes.STRING(50),
+            allowNull: false
+        },
+        email: {
+            type: DataTypes.STRING(50),
+            allowNull: false
+        },
+        url: DataTypes.STRING(1000)
+    },
+    { timestamps: false}
+)
 
 // 아이디(username) 중복검사
 export async function findByUsername(username){
-    return db.execute('select * from users where username = ?', [username]).then
-    ((result) => {
-        console.log(result)
-        return result
-    })
+    return User.findOne({where: {username}}) // 하나만 찾기(username과 일치하는 것)
 }
 
 // id 중복검사
 export async function findById(id){
-    return db.execute('select * from users where id = ?', [id]).then((result) => {
-        console.log(result)
-        return result[0][0]
-    })
+    return User.findByPk(id) // primary key로 찾기
 }
 
 export async function createUser(user){
-    const {username, hashed, name, email, url} = user
-    return db.execute('insert into users (username, password, name, email, url) values(?, ?, ?, ?, ?)'
-    , [username, hashed, name, email, url]).then((result) => {
-        console.log(result)
-        return result[0].insertId
-    })
+    return User.create(user).then((data) => data.dataValues.id)
 }
 
 // export async function login(username){
