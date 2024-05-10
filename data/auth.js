@@ -5,14 +5,14 @@ export async function findByUsername(username){
     return db.execute('select * from users where username = ?', [username]).then
     ((result) => {
         console.log(result)
-        return result
+        return result[0][0]
     })
 }
 
 // id 중복검사
 export async function findById(id){
     return db.execute('select * from users where id = ?', [id]).then((result) => {
-        console.log(result)
+        console.log(result[0][0])
         return result[0][0]
     })
 }
