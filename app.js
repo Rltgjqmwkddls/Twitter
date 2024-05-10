@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 
 // DB 연결 테스트!
 connectDB().then((db) => {
-    console.log('몽고디비')
+    console.log('몽구스를 사용')
     app.listen(config.host.port)
 }).catch(console.error)
 
