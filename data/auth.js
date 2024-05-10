@@ -1,31 +1,21 @@
-import Mongoose from 'mongoose'
-import {useVirtualId} from '../db/database.js'
+import MongoDB from 'mongodb'
+import { getUsers } from '../db/database.js'
 
-const userSchema = new Mongoose.Schema({
-    username: {type: String, require: true},
-    name: {type: String, require: true},
-    email: {type: String, require: true},
-    password: {type: String, require: true},
-    url: String
-})
-
-useVirtualId(userSchema)
-
-const User = Mongoose.model('User', userSchema)
+const ObjectID = MongoDB.ObjectId
 
 // 아이디 (uername) 중복검사
 export async function findByUsername(username){
-    return User.findOne(username)
+    return getUsers().find({username}).next().then(mapOptionalUser)
 }
 
 // id 중복검사
 export async function findById(id){
-    return User.findById(id)
+    return getUsers().find({_id: new ObjectID(id)}).next().then(mapOptionalUser)
 }
 
 // 회원가입
 export async function createUser(user){
-    return new User(user).save().then((data) => data.id)
+    return getUsers().insertOne(user).then((result) => console.log(result.insertedId.toString()))
 }
 
 // export async function login(username){

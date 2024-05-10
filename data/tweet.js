@@ -1,46 +1,49 @@
-import Mongoose from 'mongoose'
-import {useVirtualId} from '../db/database.js'
+import MongoDB from 'mongodb';
+import {getTweets, getUsers} from '../db/database.js'
 import * as authRepository from './auth.js'
+import {Result} from 'express-validator'
 
-const tweetSchema = new Mongoose.Schema({
-    text: {type: String, require: true},
-    userId: {type:String, require: true},
-    name: {type: String, require: true},
-    username: {type: String, require: true},
-    url: String
-}, {timeseries: true})
+const ObjectID = MongoDB.ObjectId
 
-useVirtualId(tweetSchema)
-const Tweet = Mongoose.model('Tweet', tweetSchema)
 
 // 모든 트윗을 리턴
 export async function getAll() {
-    return Tweet.find().sort({createdAt: -1})
-}
+    return getTweets().find().sort({createdAt: -1}).toArray().then(mapTweets)
+} 
 
  // 해당 아이디에 대한 트윗을 리턴
  export async function getAllByUsername(username) {
-    return Tweet.find({username}).sort({createdAt: -1})
+    return getTweets().find({username}).sort({createdAt: -1}).toArray().then(mapTweets);
  }
 
  // 글 번호에 대한 트윗을 리턴
  export async function getById(id) {
-    return Tweet.findById(id)
+    return getTweets().find({_id: new ObjectID(id)}).sort({createAt: -1}).toArray().then(mapTweets);
 }
 
  // 트윗을 작성
-export async function create(text, name, userId) {
-    return authRepository.findById(userId).then((user) => new Tweet({
-        text, userId, name: user.name, username: user.username, url: user.url
-    }).save())
+export async function create(text, userId) {
+    return authRepository.findById(userId).then((user) => getTweets().insertOne({
+        text,
+        userId,
+        username: user.username,
+        url: user.url
+    })).then((result) => getById(result.insertedId)).then(mapOptionalTweet);
 }
 
 // 트윗을 변경
 export async function update(id, text) {
-    return Tweet.findByIdAndUpdate(id, {text}, {returnDocument: 'after'})
+    return getTweets().findOneAndUpdate({_id: new ObjectID(id)}, {$set: {text}}, {returnDocument: 'after'}).then((result) => result).then(mapOptionalTweet);
 }
-
 // 트윗을 삭제
 export async function remove(id){
-    return Tweet.findByIdAndDelete(id)
+    return getTweets().deleteOne({_id: new ObjectID(id)});
+}
+
+function mapTweets(tweets){
+    return tweets.map(mapOptionalTweet);
+}
+
+function mapOptionalTweet(tweet){
+    return tweet ? { ...tweet, id: tweet.insertedId } : tweet;
 }
